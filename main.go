@@ -8,16 +8,22 @@ import (
 	"unicode"
 )
 
-func validateID(id string) error {
-	// check id length
-	if len(id) > 10 && len(id) < 1 {
-		return errors.New("id length is invalid")
-	}
+func validateID(idList []string) error {
 
-	// check upper
-	for _, s := range id {
-		if unicode.IsUpper(s) && unicode.IsLetter(s) {
-			return errors.New("id is not lower")
+	if len(idList) < 2 || len(idList) > 1000 {
+		return errors.New("invalid list length")
+	}
+	for _, id := range idList {
+		// check id length
+		if len(id) > 10 || len(id) < 1 {
+			return errors.New("id length is invalid")
+		}
+
+		// check upper
+		for _, s := range id {
+			if unicode.IsUpper(s) && unicode.IsLetter(s) {
+				return errors.New("id is not lower")
+			}
 		}
 	}
 
@@ -25,16 +31,22 @@ func validateID(id string) error {
 	return nil
 }
 
-func validateReport(report string) error {
-	// check report length
-	if len(report) < 1 && len(report) > 200000 {
-		return errors.New("report length is invalid")
+func validateReport(report []string) error {
+	if len(report) < 1 || len(report) > 200000 {
+		return errors.New("invalid report list length")
 	}
 
-	// check upper
-	for _, s := range report {
-		if unicode.IsUpper(s) && unicode.IsLetter(s) {
-			return errors.New("id is not lower")
+	for _, r := range report {
+		// check report length
+		if len(r) < 3 || len(r) > 21 {
+			return errors.New("report length is invalid")
+		}
+
+		// check upper
+		for _, s := range r {
+			if unicode.IsUpper(s) && unicode.IsLetter(s) {
+				return errors.New("id is not lower")
+			}
 		}
 	}
 
@@ -42,8 +54,9 @@ func validateReport(report string) error {
 }
 
 func getReportedCount(id string, report, stoppedUser []string) int {
-	result := 0
+	var result int
 	for _, r := range report {
+
 		s := strings.Split(r, " ")
 		if id != s[0] {
 			continue
@@ -56,12 +69,12 @@ func getReportedCount(id string, report, stoppedUser []string) int {
 			}
 		}
 	}
-
+	//fmt.Printf("id %s, result: %d\n",id, result )
 	return result
 }
 
 func mergeReport(arr []string) []string {
-	ret := []string{}
+	var ret []string
 	m := make(map[string]struct{})
 
 	for _, val := range arr {
@@ -79,32 +92,26 @@ func solution(list []string, report []string, k int) []int {
 	var stoppedUser []string
 
 	// validate list, report, k
-	if len(list) < 2 || len(list) > 1000 {
-		log.Fatal(errors.New("invalid list"))
+
+	if err := validateID(list); err != nil {
+		log.Fatal(err)
 	}
 
-	if len(report) < 1 || len(report) > 200000 {
-		log.Fatal(errors.New("invalid report"))
+	if err := validateReport(report); err != nil {
+		log.Fatal(err)
 	}
 
-	if k < 0 || k > 200 {
+	if k < 1 || k > 200 {
 		log.Fatal(errors.New("invalid k"))
 	}
 
 	reports := mergeReport(report)
 	reportedUserMap := make(map[string]int)
+	userMap := make(map[string]string)
 
 	// check report
 	for _, id := range list {
-		if err := validateID(id); err != nil {
-			log.Fatal(err)
-		}
-
 		for _, r := range reports {
-			if err := validateReport(r); err != nil {
-				log.Fatal(err)
-			}
-
 			s := strings.Split(r, " ")
 			if id != s[0] {
 				continue
@@ -113,20 +120,20 @@ func solution(list []string, report []string, k int) []int {
 			reportedUser := s[1]
 			// get reportedUser(ex muzi: 1, frodo: 2), and stoppedUser
 			// init reportUserMap
-			if reportedUserMap[reportedUser] == 0 {
-				reportedUserMap[reportedUser] = 1
-				fmt.Println(reportedUserMap)
-				continue
-			}
-			// check is key equal reportedUser
-			for key := range reportedUserMap {
-				if key != reportedUser {
-					continue
-				}
-				reportedUserMap[key] = reportedUserMap[key] + 1
-			}
+			reportedUserMap[reportedUser] = reportedUserMap[reportedUser] + 1
 
 			if reportedUserMap[reportedUser] < k {
+				continue
+			}
+
+			flag := false
+			for _, su := range stoppedUser {
+				if reportedUser == su {
+					flag = true
+				}
+			}
+
+			if flag {
 				continue
 			}
 
@@ -135,6 +142,7 @@ func solution(list []string, report []string, k int) []int {
 		}
 	}
 
+	fmt.Println(stoppedUser)
 	// check how many reportedUser stopped by reportUser
 	for _, id := range list {
 		result := getReportedCount(id, report, stoppedUser)
@@ -147,15 +155,13 @@ func solution(list []string, report []string, k int) []int {
 
 func main() {
 	var user = []string{"muzi", "appeach", "frodo", "alex", "tini", "wink"}
-	var report = []string{"muzi frodo", "appeach frodo", "alex frodo", "tini muzi", "frodo muzi", "appeach muzi", "wink alex"}
-	var count = 3
-	r := solution(user, report, count)
-	fmt.Println(r)
+	var report = []string{"muzi frodo", "appeach frodo", "alex frodo", "tini neo", "frodo muzi", "appeach muzi", "wink alex", "muzi neo"}
+	var count = 2
+	fmt.Println(solution(user, report, count))
 
 	var user2 = []string{"con", "ryan"}
 	var report2 = []string{"ryan con", "ryan con", "ryan con", "ryan con"}
 	var count2 = 3
 
-	r2 := solution(user2, report2, count2)
-	fmt.Println(r2)
+	fmt.Println(solution(user2, report2, count2))
 }
