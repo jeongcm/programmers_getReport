@@ -73,6 +73,7 @@ func mergeReport(arr []string) []string {
 
 	return ret
 }
+
 func solution(list []string, report []string, k int) []int {
 	var results []int
 	var stoppedUser []string
@@ -92,6 +93,7 @@ func solution(list []string, report []string, k int) []int {
 
 	reports := mergeReport(report)
 	reportedUserMap := make(map[string]int)
+
 	// check report
 	for _, id := range list {
 		if err := validateID(id); err != nil {
