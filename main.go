@@ -79,15 +79,15 @@ func solution(list []string, report []string, k int) []int {
 	var stoppedUser []string
 
 	// validate list, report, k
-	if len(list) < 2 && len(list) > 1000 {
+	if len(list) < 2 || len(list) > 1000 {
 		log.Fatal(errors.New("invalid list"))
 	}
 
-	if len(report) < 1 && len(report) > 200000 {
+	if len(report) < 1 || len(report) > 200000 {
 		log.Fatal(errors.New("invalid report"))
 	}
 
-	if k < 0 && k > 200 {
+	if k < 0 || k > 200 {
 		log.Fatal(errors.New("invalid k"))
 	}
 
