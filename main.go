@@ -60,6 +60,19 @@ func getReportedCount(id string, report, stoppedUser []string) int {
 	return result
 }
 
+func mergeReport(arr []string) []string {
+	ret := []string{}
+	m := make(map[string]struct{})
+
+	for _, val := range arr {
+		if _, ok := m[val]; !ok {
+			m[val] = struct{}{}
+			ret = append(ret, val)
+		}
+	}
+
+	return ret
+}
 func solution(list []string, report []string, k int) []int {
 	var results []int
 	var stoppedUser []string
@@ -77,6 +90,7 @@ func solution(list []string, report []string, k int) []int {
 		log.Fatal(errors.New("invalid k"))
 	}
 
+	reports := mergeReport(report)
 	reportedUserMap := make(map[string]int)
 	// check report
 	for _, id := range list {
@@ -84,7 +98,7 @@ func solution(list []string, report []string, k int) []int {
 			log.Fatal(err)
 		}
 
-		for _, r := range report {
+		for _, r := range reports {
 			if err := validateReport(r); err != nil {
 				log.Fatal(err)
 			}
@@ -96,7 +110,7 @@ func solution(list []string, report []string, k int) []int {
 
 			reportedUser := s[1]
 			// get reportedUser(ex muzi: 1, frodo: 2), and stoppedUser
-				// init reportUserMap
+			// init reportUserMap
 			if reportedUserMap[reportedUser] == 0 {
 				reportedUserMap[reportedUser] = 1
 				fmt.Println(reportedUserMap)
@@ -135,4 +149,11 @@ func main() {
 	var count = 3
 	r := solution(user, report, count)
 	fmt.Println(r)
+
+	var user2 = []string{"con", "ryan"}
+	var report2 = []string{"ryan con", "ryan con", "ryan con", "ryan con"}
+	var count2 = 3
+
+	r2 := solution(user2, report2, count2)
+	fmt.Println(r2)
 }

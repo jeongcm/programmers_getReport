@@ -11,6 +11,10 @@ func TestReportCount(t *testing.T) {
 		t.Log(result)
 
 	}
-
 }
 
+func TestMergeReport(t *testing.T) {
+	var report = []string{"ryan con", "ryan con", "ryan con", "ryan con"}
+	r := mergeReport(report)
+	t.Log(r)
+}
